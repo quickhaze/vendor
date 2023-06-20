@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Vendor , OTPVerification
+from .models import Vendor , OTPVerification, VendorProfile
 
 class VendorAdmin(UserAdmin):
     list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
@@ -19,3 +19,4 @@ class VendorAdmin(UserAdmin):
 
 admin.site.register(Vendor, VendorAdmin)
 admin.site.register(OTPVerification)
+admin.site.register(VendorProfile)

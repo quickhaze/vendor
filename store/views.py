@@ -1,11 +1,12 @@
 from rest_framework import viewsets
+from rest_framework.views import APIView
 from .models import Vendor, VendorProfile, Artwork, VendorSale, Payment, Tender
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 # from .serializers import VendorSerializer, VendorProfileSerializer, ArtworkSerializer, VendorSaleSerializer, PaymentSerializer, TenderSerializer
 from .serializers import (
     VendorSerializer,
-  VendorProfileSerializer )#, ArtworkSerializer, VendorSaleSerializer, PaymentSerializer, TenderSerializer
+  VendorProfileSerializer, ArtworkSerializer ) #, VendorSaleSerializer, PaymentSerializer, TenderSerializer
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
@@ -39,6 +40,7 @@ class VendorViewSet(viewsets.ModelViewSet):
         # Authenticate the vendor
         user = self.auth_user()
         if user is not None and user.is_active:
+            # import pdb; pdb.set_trace()
             if hasattr(user, "vendorprofile"):
                 if not user.is_approved:
                     message = "Your account has not been approved"
@@ -94,15 +96,30 @@ class VendorViewSet(viewsets.ModelViewSet):
             message = "Resent"
             _status = status.HTTP_201_CREATED
         return Response({'detail': message}, status=_status)
-        
+
+class VendorLogin(APIView):
+
+    def post(self, request):
+        return Response()
+
+
 class VendorProfileViewSet(viewsets.ModelViewSet):
     queryset = VendorProfile.objects.all()
     serializer_class = VendorProfileSerializer
     authentication_classes = [SessionAuthentication]  # Add authentication class
     permission_classes = [IsAuthenticated] 
-# class ArtworkViewSet(viewsets.ModelViewSet):
-#     queryset = Artwork.objects.all()
-#     serializer_class = ArtworkSerializer
+
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(serializer.data)
+
+class ArtworkViewSet(viewsets.ModelViewSet):
+    queryset = Artwork.objects.all()
+    serializer_class = ArtworkSerializer
 
 # class VendorSaleViewSet(viewsets.ModelViewSet):
 #     queryset = VendorSale.objects.all()

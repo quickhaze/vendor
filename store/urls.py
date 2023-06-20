@@ -1,6 +1,7 @@
 from django.urls import path, include
 from rest_framework import routers
 from .views import VendorViewSet, VendorProfileViewSet#, ArtworkViewSet, VendorSaleViewSet, PaymentViewSet, TenderViewSet
+from .views import VendorLogin
 
 router = routers.DefaultRouter()
 router.register(r'vendors', VendorViewSet)
@@ -15,6 +16,7 @@ urlpatterns = [
     path('api/vendor/login/', VendorViewSet.as_view({'post': 'login'}), name='vendor-login'),
     path('api/vendor/verify-otp/', VendorViewSet.as_view({'post': 'verify_otp'}), name='vendor-verify-otp'),
     path('api/vendor/resend-otp/', VendorViewSet.as_view({'post': 'resend_otp'}), name='vendor-resend-otp'),
+    path('api/vendor/login/', VendorLogin.as_view(), name='vendor-login'),
 ] + router.urls
 
 # router.register(r'artworks', ArtworkViewSet)

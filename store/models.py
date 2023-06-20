@@ -16,6 +16,8 @@ class Vendor(AbstractUser):
         otp_verification = OTPVerification.objects.create(vendor=self)
         otp_verification.send_otp()  # Send OTP via email or any other method
     
+    def __str__(self) -> str:
+        return self.email
 
 class OTPVerification(models.Model):
     vendor = models.OneToOneField(Vendor, on_delete=models.CASCADE)
@@ -31,10 +33,14 @@ class OTPVerification(models.Model):
     def verify_otp(self):
         self.verified  = True
         self.save()
-
+        self.create_vendor_profile()
     def __str__(self):
         return f"OTP: {self.otp} - Vendor: {self.vendor.username}"
 
+    def create_vendor_profile(self):
+      VendorProfile.objects.create(
+          vendor = self.vendor
+      )  
 class VendorProfile(models.Model):
     WORKING = 'working'
     STUDYING = 'studying'
@@ -47,13 +53,13 @@ class VendorProfile(models.Model):
     ]
     
     vendor = models.OneToOneField(Vendor, on_delete=models.CASCADE)
-    name = models.CharField(max_length=255)
-    age = models.IntegerField()
-    city = models.CharField(max_length=255)
-    working_or_studying = models.CharField(max_length=255, choices=WORK_STATUS_CHOICES)
+    name = models.CharField(max_length=255, blank=True, null=True)
+    age = models.IntegerField(null=True, blank=True)
+    city = models.CharField(max_length=255, null=True, blank=True)
+    working_or_studying = models.CharField(max_length=255, choices=WORK_STATUS_CHOICES, null=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.vendor}"
 
 
 class Artwork(models.Model):
